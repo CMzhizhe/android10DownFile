@@ -2,9 +2,15 @@ package com.gxx.myapplication;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 
 
 import java.io.BufferedInputStream;
@@ -28,6 +34,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
+import static android.os.Environment.DIRECTORY_DCIM;
 import static android.os.Environment.DIRECTORY_DOWNLOADS;
 import static android.os.Environment.DIRECTORY_MOVIES;
 import static android.os.Environment.DIRECTORY_MUSIC;
@@ -39,6 +46,7 @@ import static android.os.Environment.DIRECTORY_PICTURES;
  * @description:图片，视频下载工具
  **/
 public class HttpDownFileUtils {
+    private String TAG = HttpDownFileUtils.class.getSimpleName();
     private static HttpDownFileUtils downFileUtils;
     public static final int LOADING = 0;//加载中
     public static final int SUCCESS=1;
@@ -563,20 +571,20 @@ public class HttpDownFileUtils {
                     ContentValues contentValues = new ContentValues();
                     if (inserType.equals(DIRECTORY_PICTURES)) {
                         contentValues.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
-                        contentValues.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+                        contentValues.put(MediaStore.Images.Media.MIME_TYPE, getMIMEType(fileName));
                         contentValues.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis());
                         //只是往 MediaStore 里面插入一条新的记录，MediaStore 会返回给我们一个空的 Content Uri
                         //接下来问题就转化为往这个 Content Uri 里面写入
                         uri = context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
                     } else if (inserType.equals(DIRECTORY_MOVIES)) {
-                        contentValues.put(MediaStore.Video.Media.MIME_TYPE, "video/mp4");
+                        contentValues.put(MediaStore.Video.Media.MIME_TYPE, getMIMEType(fileName));
                         contentValues.put(MediaStore.Video.Media.DISPLAY_NAME, fileName);
                         contentValues.put(MediaStore.Video.Media.DATE_TAKEN, System.currentTimeMillis());
                         //只是往 MediaStore 里面插入一条新的记录，MediaStore 会返回给我们一个空的 Content Uri
                         //接下来问题就转化为往这个 Content Uri 里面写入
                         uri = context.getContentResolver().insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, contentValues);
                     } else if (inserType.equals(DIRECTORY_MUSIC)) {
-                        contentValues.put(MediaStore.Audio.Media.MIME_TYPE, "audio/mp3");
+                        contentValues.put(MediaStore.Audio.Media.MIME_TYPE, getMIMEType(fileName));
                         contentValues.put(MediaStore.Audio.Media.DISPLAY_NAME, fileName);
                         if (Build.VERSION.SDK_INT>=29){//android 10
                             contentValues.put(MediaStore.Audio.Media.DATE_TAKEN, System.currentTimeMillis());
@@ -599,6 +607,18 @@ public class HttpDownFileUtils {
                                 onFileDownListener.onFileDownStatus(LOADING, null, (total * 100 / contentLeng), total, contentLeng);
                             }
                         }
+                    }
+
+                    //oppo手机不会出现在照片里面，但是会出现在图集里面
+                    if (inserType.equals(DIRECTORY_PICTURES)){//如果是图片
+                        //扫描到相册
+                        String[] filePathArray = FileSDCardUtil.getInstance().getPathFromContentUri(uri,context);
+                        MediaScannerConnection.scanFile(context, new String[] {filePathArray[0]}, new String[]{"image/jpeg"}, new MediaScannerConnection.OnScanCompletedListener(){
+                            @Override
+                            public void onScanCompleted(String path, Uri uri) {
+                                Log.e(TAG,"PATH:"+path);
+                            }
+                        } );
                     }
                     os.flush();
                     inputStream.close();
@@ -634,7 +654,7 @@ public class HttpDownFileUtils {
 
                     @Override
                     public void onError(Throwable e) {
-
+                        Log.e(TAG,"错误信息:"+e.getMessage());
                     }
 
                     @Override

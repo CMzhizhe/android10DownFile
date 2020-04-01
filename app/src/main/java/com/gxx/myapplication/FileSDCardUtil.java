@@ -1,9 +1,12 @@
 package com.gxx.myapplication;
 
+import android.content.ContentResolver;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
+import android.provider.MediaStore;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -291,6 +294,30 @@ public class FileSDCardUtil {
 
                     }
                 });
+    }
+
+
+    /**
+     * @date 创建时间:2020/4/1 0001
+     * @auther gaoxiaoxiong
+     * @Descriptiion 通过Uri 获取 filePath  fileName
+     **/
+    public String[] getPathFromContentUri(Uri contentUri, Context context) {
+        if (contentUri == null) {
+            return null;
+        }
+        String filePath;
+        String fileName;
+        String[] filePathColumn = {MediaStore.MediaColumns.DATA, MediaStore.MediaColumns.DISPLAY_NAME};
+        ContentResolver contentResolver = context.getContentResolver();
+        Cursor cursor = contentResolver.query(contentUri, filePathColumn, null,
+                null, null);
+        cursor.moveToFirst();
+        filePath = cursor.getString(cursor.getColumnIndex(filePathColumn[0]));
+        fileName = cursor.getString(cursor.getColumnIndex(filePathColumn[1]));
+        cursor.close();
+        String[] strings = new String[]{filePath,fileName};
+        return strings;
     }
 
 }
