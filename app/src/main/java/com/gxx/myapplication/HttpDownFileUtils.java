@@ -124,13 +124,13 @@ public class HttpDownFileUtils {
                     BufferedInputStream bis = new BufferedInputStream(is);
                     byte[] buffer = new byte[1024];
                     int len;
-                    int total = 0;
-                    int contentLeng = conn.getContentLength();
+                    long total = 0;
+                    long contentLeng = conn.getContentLength();
                     while ((len = bis.read(buffer)) != -1) {
                         fos.write(buffer, 0, len);
                         total += len;
                         if (onFileDownListener != null) {
-                            onFileDownListener.onFileDownStatus(0, null, (total * 100 / contentLeng), total, contentLeng);
+                            onFileDownListener.onFileDownStatus(0, null, (int) (total * 100 / contentLeng), total, contentLeng);
                         }
                     }
                     fos.close();
@@ -255,13 +255,13 @@ public class HttpDownFileUtils {
                     BufferedInputStream bis = new BufferedInputStream(is);
                     byte[] buffer = new byte[1024];
                     int len;
-                    int total = 0;
-                    int contentLeng = conn.getContentLength();
+                    long total = 0;
+                    long contentLeng = conn.getContentLength();
                     while ((len = bis.read(buffer)) != -1) {
                         fos.write(buffer, 0, len);
                         total += len;
                         if (onFileDownListener != null) {
-                            onFileDownListener.onFileDownStatus(0, null, (total * 100 / contentLeng), total, contentLeng);
+                            onFileDownListener.onFileDownStatus(0, null, (int) (total * 100 / contentLeng), total, contentLeng);
                         }
                     }
                     fos.close();
@@ -378,13 +378,13 @@ public class HttpDownFileUtils {
                 BufferedInputStream bis = new BufferedInputStream(is);
                 byte[] buffer = new byte[1024];
                 int len;
-                int total = 0;
-                int contentLeng = conn.getContentLength();
+                long total = 0;
+                long contentLeng = conn.getContentLength();
                 while ((len = bis.read(buffer)) != -1) {
                     fos.write(buffer, 0, len);
                     total += len;
                     if (onFileDownListener != null) {
-                        onFileDownListener.onFileDownStatus(LOADING, null, (total * 100 / contentLeng), total, contentLeng);
+                        onFileDownListener.onFileDownStatus(LOADING, null, (int) (total * 100 / contentLeng), total, contentLeng);
                     }
                 }
                 return file;
@@ -470,13 +470,13 @@ public class HttpDownFileUtils {
                         if (os != null) {
                             byte[] buffer = new byte[1024];
                             int len;
-                            int total = 0;
-                            int contentLeng = conn.getContentLength();
+                            long total = 0;
+                            long contentLeng = conn.getContentLength();
                             while ((len = inputStream.read(buffer)) != -1) {
                                 os.write(buffer, 0, len);
                                 total += len;
                                 if (onFileDownListener != null) {
-                                    onFileDownListener.onFileDownStatus(LOADING, null, (total * 100 / contentLeng), total, contentLeng);
+                                    onFileDownListener.onFileDownStatus(LOADING, null, (int) (total * 100 / contentLeng), total, contentLeng);
                                 }
                             }
                         }
@@ -598,13 +598,13 @@ public class HttpDownFileUtils {
                     if (os != null) {
                         byte[] buffer = new byte[1024];
                         int len;
-                        int total = 0;
-                        int contentLeng = conn.getContentLength();
+                        long total = 0;
+                        long contentLeng = conn.getContentLength();
                         while ((len = inputStream.read(buffer)) != -1) {
                             os.write(buffer, 0, len);
                             total += len;
                             if (onFileDownListener != null) {
-                                onFileDownListener.onFileDownStatus(LOADING, null, (total * 100 / contentLeng), total, contentLeng);
+                                onFileDownListener.onFileDownStatus(LOADING, null, (int) (total * 100 / contentLeng), total, contentLeng);
                             }
                         }
                     }
